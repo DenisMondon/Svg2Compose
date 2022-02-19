@@ -27,11 +27,21 @@ tasks.withType<KotlinCompile> {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "AppKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "Svg2Compose"
             packageVersion = v
+            windows {
+                iconFile.set(File("icon.ico"))
+                menuGroup = "start-menu-group"
+            }
+            linux {
+                iconFile.set(File("icon.png"))
+            }
+            macOS {
+                iconFile.set(File("icon.icns"))
+            }
         }
     }
 }
