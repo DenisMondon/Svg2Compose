@@ -1,5 +1,5 @@
 # Svg2Compose
-Transforms a VectorDrawable or a SVG path to a Compose ImageVector.
+Transforms a Vector Drawable or a SVG path to a Compose ImageVector.
 
 ## Download
 Download the latest version (Windows or MacOS) here: [Releases](https://github.com/DenisMondon/Svg2Compose/releases).
