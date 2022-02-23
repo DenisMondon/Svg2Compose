@@ -288,6 +288,7 @@ fun MainScreen() {
                     showChooseFileDialog = false
                     if (!directoryPath.isNullOrBlank() && !fileName.isNullOrBlank()) {
                         val file = File(directoryPath, fileName)
+                        val fileNameWithoutExtension = file.nameWithoutExtension.replace("ic_", "").trim()
                         vectorDrawableTextFieldValue = TextFieldValue(file.readText())
                         svgPathTextFieldValue = TextFieldValue("")
                         val svgData = buildSvgData(
@@ -295,7 +296,17 @@ fun MainScreen() {
                             vectorDrawableValue = vectorDrawableTextFieldValue.text,
                             svgPathValue = svgPathTextFieldValue.text,
                             onColorsNotFound = { unknownColors = it },
-                        ) ?: return@ChooseFileDialog
+                        ) ?: run {
+                            svg = Svg(
+                                pathDecomposed = "",
+                                imageVectorCode = "",
+                                imageVector = null,
+                                `package` = "",
+                                imports = "",
+                                fileName = fileNameWithoutExtension,
+                            )
+                            return@ChooseFileDialog
+                        }
 
                         svg = Svg(
                             pathDecomposed = svgData.toPathDecomposed(),
@@ -303,7 +314,7 @@ fun MainScreen() {
                             imageVector = svgData.toImageVector(),
                             `package` = svgData.toPackage(),
                             imports = svgData.toImports(),
-                            fileName = file.nameWithoutExtension,
+                            fileName = fileNameWithoutExtension,
                         )
                     }
                 },
@@ -311,7 +322,7 @@ fun MainScreen() {
         } else if (showSaveFileDialog) {
             var svgFileName = svg?.fileName?.takeIf { it.isNotBlank() }?.let {
                 "${it.first().uppercase()}${it.substring(1)}"
-            } ?: "Icon.kt"
+            } ?: "Icon"
             var index = svgFileName.indexOf('_')
             while (index != -1) {
                 val start = svgFileName.substring(0, index)
