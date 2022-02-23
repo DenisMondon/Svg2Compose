@@ -30,6 +30,7 @@ object SvgPathParser {
         val unknownColors = mutableSetOf<String>()
         val pathConverted = SvgData.PathConverted(
             path = svgPath
+                .replace("-", " -")
                 .split(Regex("(?=[MmLlHhVvCcSsQqTtAaZz])"))
                 .filterNot { it.isEmpty() }
                 .mapNotNull {
@@ -90,32 +91,15 @@ object SvgPathParser {
     private fun String.toColorOrNull(onColorNotFound: (colorValue: String) -> Unit): Color? = this
         .trim()
         .takeIf { it.firstOrNull() == '#' }
-        ?.let {
-            when (it.length) {
-                4 -> {//#FFF format
-                    val value = it.substring(1).toList().joinToString("") { char -> "$char$char" }
-                    val javaColor = java.awt.Color.decode("#$value")
-                    Color(javaColor.red, javaColor.green, javaColor.blue, 255)
-                }
-                7 -> {//#FFFFFF format
-                    val javaColor = java.awt.Color.decode(it)
-                    Color(javaColor.red, javaColor.green, javaColor.blue, 255)
-                }
-                9 -> {//#FFFFFFFF format
-                    val i = java.lang.Long.decode(it).toInt()
-                    val javaColor = java.awt.Color(i shr 16 and 0xFF, i shr 8 and 0xFF, i and 0xFF, i shr 24 and 0xFF)
-                    Color(javaColor.red, javaColor.green, javaColor.blue, javaColor.alpha)
-                }
-                else -> null
+        ?.let { UnknownColors.decodeColor(it) }
+        ?: let {
+            if (UnknownColors.unknownColors.containsKey(it)) {
+                UnknownColors.unknownColors.getValue(it).toColorOrNull {}
+            } else {
+                onColorNotFound(it)
+                null
             }
-        } ?: let {
-        if (UnknownColors.unknownColors.containsKey(it)) {
-            UnknownColors.unknownColors.getValue(it).toColorOrNull {}
-        } else {
-            onColorNotFound(it)
-            null
         }
-    }
 
     private fun String?.toColor(onColorNotFound: (colorValue: String) -> Unit): Color {
         val color = this?.trim() ?: return Black
@@ -124,30 +108,32 @@ object SvgPathParser {
 
     private fun String.toColorValueOrNull(onColorNotFound: (colorValue: String) -> Unit): String? = this
         .trim()
-        .replace("#", "")
-        .uppercase()
-        .let {
+        .takeIf { it.firstOrNull() == '#' }
+        ?.uppercase()
+        ?.let {
+            UnknownColors.decodeColor(it) ?: return@let null
             when (it.length) {
-                3 -> {//#FFF format
-                    val value = listOf("0xFF").plus(it.toList().joinToString("") { char -> "$char$char" })
+                4 -> {//#FFF format
+                    val value = listOf("0xFF").plus(it.substring(1).toList().joinToString("") { char -> "$char$char" })
                     value.joinToString("")
                 }
-                6 -> {//#FFFFFF format
-                    "0xFF$it"
+                7 -> {//#FFFFFF format
+                    "0xFF${it.substring(1)}"
                 }
-                8 -> {//#FFFFFFFF format
-                    "0x$it"
+                9 -> {//#FFFFFFFF format
+                    "0x${it.substring(1)}"
                 }
                 else -> null
             }
-        } ?: let {
-        if (UnknownColors.unknownColors.containsKey(it)) {
-            UnknownColors.unknownColors.getValue(it).toColorValueOrNull {}
-        } else {
-            onColorNotFound(it)
-            null
         }
-    }
+        ?: let {
+            if (UnknownColors.unknownColors.containsKey(it)) {
+                UnknownColors.unknownColors.getValue(it).toColorValueOrNull {}
+            } else {
+                onColorNotFound(it)
+                null
+            }
+        }
 
     private fun String?.toColorValue(onColorNotFound: (colorValue: String) -> Unit): String {
         val color = this?.trim() ?: return "0xFF000000"

@@ -84,12 +84,12 @@ data class SvgData(
                         if (values.size % 6 == 0) {
                             var i = 0
                             repeat(values.size / 6) {
-                                val x1 = values.getOrNull(0) ?: return@loop
-                                val y1 = values.getOrNull(1) ?: return@loop
-                                val x2 = values.getOrNull(2) ?: return@loop
-                                val y2 = values.getOrNull(3) ?: return@loop
-                                val x3 = values.getOrNull(4) ?: return@loop
-                                val y3 = values.getOrNull(5) ?: return@loop
+                                val x1 = values.getOrNull(i) ?: return@loop
+                                val y1 = values.getOrNull(i + 1) ?: return@loop
+                                val x2 = values.getOrNull(i + 2) ?: return@loop
+                                val y2 = values.getOrNull(i + 3) ?: return@loop
+                                val x3 = values.getOrNull(i + 4) ?: return@loop
+                                val y3 = values.getOrNull(i + 5) ?: return@loop
                                 pathDecomposed += if (i == 0) "\n$type${x1},${y1},${x2},${y2},${x3},${y3}"
                                 else "\n  ${x1},${y1},${x2},${y2},${x3},${y3}"
                                 i += 6
@@ -113,10 +113,10 @@ data class SvgData(
                         if (values.size % 4 == 0) {
                             var i = 0
                             repeat(values.size / 4) {
-                                val x1 = values.getOrNull(0) ?: return@loop
-                                val y1 = values.getOrNull(1) ?: return@loop
-                                val x2 = values.getOrNull(2) ?: return@loop
-                                val y2 = values.getOrNull(3) ?: return@loop
+                                val x1 = values.getOrNull(i) ?: return@loop
+                                val y1 = values.getOrNull(i + 1) ?: return@loop
+                                val x2 = values.getOrNull(i + 2) ?: return@loop
+                                val y2 = values.getOrNull(i + 3) ?: return@loop
                                 pathDecomposed += if (i == 0) "\n$type${x1} ${y1}, $x2 $y2" else "\n  $x1 ${y1}, $x2 $y2"
                                 i += 4
                             }
@@ -126,8 +126,8 @@ data class SvgData(
                         if (values.size % 2 == 0) {
                             var i = 0
                             repeat(values.size / 2) {
-                                val x = values.getOrNull(0) ?: return@loop
-                                val y = values.getOrNull(1) ?: return@loop
+                                val x = values.getOrNull(i) ?: return@loop
+                                val y = values.getOrNull(i + 1) ?: return@loop
                                 pathDecomposed += if (i == 0) "\n$type${x} $y" else "\n  $x $y"
                                 i += 2
                             }
@@ -137,13 +137,13 @@ data class SvgData(
                         if (values.size % 7 == 0) {
                             var i = 0
                             repeat(values.size / 7) {
-                                val rx = values.getOrNull(0) ?: return@loop
-                                val ry = values.getOrNull(1) ?: return@loop
-                                val xAxisRotation = values.getOrNull(2) ?: return@loop
-                                val largeArcFlag = values.getOrNull(3)?.toInt() ?: return@loop
-                                val sweepFlag = values.getOrNull(4)?.toInt() ?: return@loop
-                                val x = values.getOrNull(5) ?: return@loop
-                                val y = values.getOrNull(6) ?: return@loop
+                                val rx = values.getOrNull(i) ?: return@loop
+                                val ry = values.getOrNull(i + 1) ?: return@loop
+                                val xAxisRotation = values.getOrNull(i + 2) ?: return@loop
+                                val largeArcFlag = values.getOrNull(i + 3)?.toInt() ?: return@loop
+                                val sweepFlag = values.getOrNull(i + 4)?.toInt() ?: return@loop
+                                val x = values.getOrNull(i + 5) ?: return@loop
+                                val y = values.getOrNull(i + 6) ?: return@loop
                                 pathDecomposed += if (i == 0) "\n$type${rx},${ry} ${xAxisRotation},${largeArcFlag} ${sweepFlag},${x} $y"
                                 else "\n  ${rx},${ry} ${xAxisRotation},${largeArcFlag} ${sweepFlag},${x} $y"
                                 i += 7
@@ -678,6 +678,33 @@ data class SvgData(
             }
         }
         close()
+    }
+
+    fun toPackage(): String = "package [YOUR_PACKAGE_NAME]\n\n"
+
+    fun toImports(): String {
+        val hasAnyDefaultPath = paths.any { it.isPathDefault() }
+        val hasAnyCustomPath = paths.any { !it.isPathDefault() }
+
+        var imports = "import androidx.compose.foundation.Image\n" +
+                "import androidx.compose.material.icons.Icons\n" +
+                "import androidx.compose.runtime.Composable\n" +
+                "import androidx.compose.ui.graphics.vector.ImageVector\n" +
+                "import androidx.compose.ui.tooling.preview.Preview\n"
+
+        imports += if (isMaterialIcon) "import androidx.compose.material.icons.materialIcon\n"
+        else "import androidx.compose.ui.unit.dp\n"
+        if (hasAnyDefaultPath) imports += "import androidx.compose.material.icons.materialPath\n"
+        if (hasAnyCustomPath) imports += "import androidx.compose.ui.graphics.Color\n" +
+                "import androidx.compose.ui.graphics.PathFillType\n" +
+                "import androidx.compose.ui.graphics.SolidColor\n" +
+                "import androidx.compose.ui.graphics.StrokeCap\n" +
+                "import androidx.compose.ui.graphics.StrokeJoin\n" +
+                "import androidx.compose.ui.graphics.vector.path\n"
+
+        imports += "\n"
+
+        return imports
     }
 
     companion object {

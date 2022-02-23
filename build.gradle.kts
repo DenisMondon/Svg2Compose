@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.compose") version "1.0.1"
 }
 
-val v = "1.0.0"
+val v = "1.1.0"
 group = "com.blunderer"
 version = v
 
@@ -35,6 +35,7 @@ compose.desktop {
             windows {
                 iconFile.set(File("icon.ico"))
                 menuGroup = "start-menu-group"
+                upgradeUuid = "0DFB0005-59B7-4702-BD47-CED700CEB37C"
             }
             linux {
                 iconFile.set(File("icon.png"))
