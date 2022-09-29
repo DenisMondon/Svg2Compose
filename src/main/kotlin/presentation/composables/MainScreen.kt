@@ -29,19 +29,11 @@ import domain.Export
 import domain.SvgPathParser
 import domain.UnknownColors
 import domain.VectorDrawableParser
+import model.Svg
 import model.SvgData
 import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
-
-data class Svg(
-    val pathDecomposed: String,
-    val imageVectorCode: String,
-    val imageVector: ImageVector?,
-    val `package`: String,
-    val imports: String,
-    val fileName: String?,
-)
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi

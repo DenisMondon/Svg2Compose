@@ -1,6 +1,6 @@
 package domain
 
-import Svg
+import model.Svg
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -18,7 +18,7 @@ object Export {
                 FileWriter(this).apply {
                     write(
                         svg.`package` +
-                            svg.imports +
+                                svg.imports +
                                 svg.imageVectorCode.replace(
                                     "[IconName]",
                                     "${this@with.nameWithoutExtension.firstOrNull()?.uppercase()}" +
