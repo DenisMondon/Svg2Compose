@@ -1,13 +1,11 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.0.1"
+    kotlin("jvm") version "1.9.10"
+    id("org.jetbrains.compose") version "1.5.1"
 }
 
-val v = "1.0.0"
+val v = "1.0.1"
 group = "com.blunderer"
 version = v
 
@@ -21,8 +19,8 @@ dependencies {
     implementation(compose.desktop.currentOs)
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "15"
+kotlin {
+    jvmToolchain(17)
 }
 
 compose.desktop {
